@@ -13,9 +13,9 @@ func inc(ip net.IP) {
 	}
 }
 
-func parseCIDRstr(subnet *string) ([]string, error) {
+func parseCIDRstr(subnet string) ([]string, error) {
 	var ips []string
-	ip, ipnet, err := net.ParseCIDR(*subnet)
+	ip, ipnet, err := net.ParseCIDR(subnet)
 	if err != nil {
 		return nil, err
 	}
