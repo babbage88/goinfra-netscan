@@ -18,10 +18,10 @@ func scanFunc(iport string, timeout time.Duration, wg *sync.WaitGroup) {
 		if neterr, ok := err.(net.Error); ok && neterr.Timeout() {
 			pretty.PrintWarning("Connection timed out")
 		} else {
-			pretty.PrintErrorf("Connection refused", neterr)
+			pretty.PrintError("Connection refused", neterr.Error())
 		}
 	} else {
-		pretty.Printf("Connection successful to", conn.RemoteAddr().String())
+		pretty.Print("Connection successful to", conn.RemoteAddr().String())
 		conn.Close()
 	}
 }
@@ -35,14 +35,13 @@ func main() {
 	ips, err := parseCIDRstr(*subnet)
 	if err != nil {
 		pretty.PrintErrorf("Error parsing provided subnet: %s", *subnet)
-		pretty.PrintErrorf("Error: ", err)
+		pretty.PrintError("Error: ", err)
 	}
 	timeoutSec := time.Duration(*timeout) * time.Second
 	var wg sync.WaitGroup
 
 	for _, ip := range ips {
 		iport := fmt.Sprintf("%s:%d", ip, *port)
-		pretty.Print(iport)
 		wg.Add(1) // Increment the counter before starting a goroutine
 		go scanFunc(iport, timeoutSec, &wg)
 	}
