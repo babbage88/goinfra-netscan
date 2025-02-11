@@ -2,6 +2,8 @@ package main
 
 import (
 	"net"
+
+	"github.com/babbage88/goinfra-netscan/internal/pretty"
 )
 
 func inc(ip net.IP) {
@@ -20,9 +22,17 @@ func parseCIDRstr(subnet string) ([]string, error) {
 		return nil, err
 	}
 	for ip := ip.Mask(ipnet.Mask); ipnet.Contains(ip); inc(ip) {
+		pretty.Printf("%s", ip.String())
 		ips = append(ips, ip.String())
 	}
+	numIps := len(ips)
+	// Checking if a /32 was was parsed, in which case dont try removing broadcast netId
+	switch numIps {
+	case 1:
+		return ips, nil
+	default:
+		ips = ips[1 : numIps-1]
+	}
 	// remove network address and broadcast address
-	return ips[1 : len(ips)-1], nil
-
+	return ips, nil
 }

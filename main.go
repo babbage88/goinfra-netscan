@@ -28,9 +28,10 @@ func scanFunc(iport string, timeout time.Duration, wg *sync.WaitGroup) {
 }
 
 func main() {
+	startTimer := time.Now()
 	subnet := flag.String("subnet", "10.0.0.0/23", "subnet to be scanned")
 	port := flag.Int("port", 22, "TCP port to scan for")
-	timeout := flag.Int("timeout", 5, "Number of Second for timeout")
+	timeout := flag.Int("timeout", 100, "Number of Milliseconds for timeout")
 	showActive := flag.Bool("show-active", true, "Only show/log active client responses")
 	flag.Parse()
 
@@ -39,7 +40,7 @@ func main() {
 		pretty.PrintErrorf("Error parsing provided subnet: %s", *subnet)
 		pretty.PrintError("Error: ", err)
 	}
-	timeoutSec := time.Duration(*timeout) * time.Second
+	timeoutSec := time.Duration(*timeout) * time.Millisecond
 	var wg sync.WaitGroup
 
 	for _, ip := range ips {
@@ -49,4 +50,6 @@ func main() {
 	}
 
 	wg.Wait()
+	totalRuntime := time.Since(startTimer)
+	pretty.Printf("Total runtime: %s", totalRuntime)
 }
