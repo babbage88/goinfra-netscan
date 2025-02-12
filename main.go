@@ -35,7 +35,7 @@ func main() {
 	showActive := flag.Bool("show-active", true, "Only show/log active client responses")
 	flag.Parse()
 
-	ips, err := parseCIDRstr(*subnet)
+	ips, err := parseClientsIpFromCIDRstr(*subnet)
 	if err != nil {
 		pretty.PrintErrorf("Error parsing provided subnet: %s", *subnet)
 		pretty.PrintError("Error: ", err)
@@ -45,7 +45,8 @@ func main() {
 
 	for _, ip := range ips {
 		iport := fmt.Sprintf("%s:%d", ip, *port)
-		wg.Add(1) // Increment the counter before starting a goroutine
+		// Increment the counter before starting a goroutine
+		wg.Add(1)
 		go PortScanfunc(iport, timeoutSec, &wg, *showActive)
 	}
 

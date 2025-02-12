@@ -38,19 +38,18 @@ func PortScanfunc(iport string, timeout time.Duration, wg *sync.WaitGroup, onlyA
 	if err != nil {
 		if neterr, ok := err.(net.Error); ok && neterr.Timeout() {
 			switch onlyActive {
-			case true:
-			default:
+			case false:
 				pretty.PrintWarning("Connection timed out")
 			}
 		} else {
 			switch onlyActive {
-			case true:
-			default:
+			case false:
 				pretty.PrintError("Connection refused", neterr.Error())
 			}
 		}
-	} else {
-		pretty.Print("Connection successful to", conn.RemoteAddr().String())
-		conn.Close()
+		return // Ensure we exit the function early if there's an error
 	}
+	defer conn.Close() // Close the connection only if it was successfully established
+
+	pretty.Print("Connection successful to", conn.RemoteAddr().String())
 }
